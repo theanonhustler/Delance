@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@celo/rainbowkit-celo": "^1.1.0",
     "@pushprotocol/restapi": "^1.4.28",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-dialog": "1.0.4",

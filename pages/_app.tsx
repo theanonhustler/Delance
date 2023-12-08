@@ -8,13 +8,17 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 // @ts-ignore
 import { polygon, polygonMumbai } from "wagmi/chains";
-
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 // @ts-ignore
 import { publicProvider } from "wagmi/providers/public";
 
+// Import CELO chain information
+import { Alfajores, Celo } from "@celo/rainbowkit-celo/chains";
+
 const { chains, publicClient } = configureChains(
-  [polygon, polygonMumbai],
-  [publicProvider()]
+  [Alfajores, Celo],
+  // @ts-ignore
+  [jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default }) })]
 );
 
 const { connectors } = getDefaultWallets({
