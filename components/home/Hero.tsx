@@ -10,6 +10,7 @@ const Hero = () => {
 					<h1 className='text-[42px] leading-tight md:text-6xl lg:text-7xl font-bold font-outfit'>
 						Connect and collaborate, where creativity meets
 						opportunity
+						small change
 					</h1>
 					<p className='text-lg font-medium'>
 						Discover collaborative opportunities for freelancers and
