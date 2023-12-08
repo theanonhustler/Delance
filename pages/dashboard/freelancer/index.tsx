@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientPostings from "@/components/clientDashboard/ClientPostings";
 import Notifications from "@/components/clientDashboard/Notifications";
 import Freelancers from "@/components/clientDashboard/Freelancers";
-// import ConnectWalletButton from "@/components/connectWalletButton";
+import ConnectWalletButton from "@/components/connectWalletButton";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import JobPostings from "@/components/freelancerDashboard/JobPostings";
@@ -28,7 +28,7 @@ function ClientDashboard() {
         <div className="flex items-center sm:justify-between sm:gap-4">
           <div className="flex flex-1 items-center justify-end gap-8">
             
-            {/* <ConnectWalletButton /> */}
+            <ConnectWalletButton />
           </div>
         </div>
         <div className="flex flex-col md:flex-row md:justify-between mt-8 md:items-center gap-4 md:gap-0">

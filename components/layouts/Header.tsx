@@ -13,7 +13,7 @@ import { Button } from "../ui/button";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { NAVBAR_NAVIGATION } from "@/constants/navigation";
 import Image from "next/image";
-// import ConnectWalletButton from "../connectWalletButton";
+import ConnectWalletButton from "../connectWalletButton";
 
 function Header() {
   return (
@@ -36,9 +36,7 @@ function Header() {
               </Button>
             </li>
           ))}
-          <li>
-            {/* <ConnectWalletButton /> */}
-          </li>
+          <li><ConnectWalletButton /></li>
         </ul>
       </div>
       <div className="lg:hidden">
@@ -68,7 +66,7 @@ function Header() {
                       </li>
                     ))}
                     <li>
-                      {/* <ConnectWalletButton className="flex flex-col" /> */}
+                      <ConnectWalletButton className="flex flex-col" />
                     </li>
                   </ul>
                 </nav>
