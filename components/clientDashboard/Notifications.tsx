@@ -60,9 +60,7 @@ function Notifications() {
                     <h1 className="text-base font-semibold">Client 1</h1>
                   </div>
                   <Button
-                    onClick={() =>
-                      router.push(`/dashboard/freelancer/posting/${idx}`)
-                    }
+                    onClick={() => router.push(`/posting/${idx}`)}
                     variant={"secondary"}
                     className="w-full h-12 text-base"
                   >

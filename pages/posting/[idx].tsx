@@ -193,10 +193,20 @@ const IndividualPostingPage = () => {
               </ul>
               <Button
                 variant={"outline"}
-                className="w-full h-12 mt-4 text-base"
+                disabled={
+                  post.freelancerId !==
+                  "0x0000000000000000000000000000000000000000"
+                }
+                className="w-full h-12 mt-4 text-base disabled:bg-gray-700/20"
                 onClick={sendPostingRequestNotification}
               >
-                Apply Now
+                {post.freelancerId !==
+                "0x0000000000000000000000000000000000000000"
+                  ? `Already assigned to ${post?.freelancerId?.slice(
+                      0,
+                      6
+                    )}x${post?.freelancerId?.slice(-6, 0)}`
+                  : "Apply Now"}
               </Button>
             </div>
           </div>
