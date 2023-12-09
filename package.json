@@ -29,6 +29,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "ethers": "5.7",
+    "javascript-time-ago": "^2.5.9",
     "lucide-react": "^0.288.0",
     "moment": "^2.29.4",
     "next": "13.5.4",

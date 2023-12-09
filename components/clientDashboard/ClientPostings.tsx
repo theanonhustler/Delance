@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import moment from "moment";
+import TimeAgo from "javascript-time-ago";
 import { CalendarRange } from "lucide-react";
+import en from "javascript-time-ago/locale/en";
 import { useRouter } from "next/router";
 import { getAllPostData } from "@/blockchain/utils";
 import { utils } from "ethers";
@@ -42,6 +43,9 @@ type Category =
 function ClientPostings() {
   const router = useRouter();
   const { address } = useAccount();
+
+  TimeAgo.addDefaultLocale(en);
+  const timeAgo = new TimeAgo("en-US");
 
   const [postings, setPostings] = useState<Posting[]>([]);
 
@@ -104,7 +108,7 @@ function ClientPostings() {
                 <p>•</p>
                 <p className="flex items-center gap-2">
                   <CalendarRange strokeWidth={1.5} size={18} />{" "}
-                  {timeConverter(post.createdAt!)}
+                  {timeAgo.format(new Date(timeConverter(post.createdAt!)))}
                 </p>
               </div>
             </div>
