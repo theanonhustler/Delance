@@ -25,12 +25,10 @@ function Notifications() {
           // @ts-ignore
           post?.freelancerRequests.includes(address)
         ) ? (
-          postings
-            .filter((post) =>
-              // @ts-ignore
-              post?.freelancerRequests.includes(address)
-            )
-            ?.map((post, idx) => {
+          postings?.map((post, idx) => {
+            // @ts-ignore
+            const freelanersRequests = post?.freelancerRequests;
+            if (freelanersRequests.includes(address))
               return (
                 <div
                   className="flex flex-col w-full gap-8 p-4 transition-all duration-300 border rounded lg:flex-ro md:justify-between md:items-center hover:-translate-y-1 bg-app-grey-light md:p-8 border-white/10"
@@ -72,7 +70,7 @@ function Notifications() {
                   </Button>
                 </div>
               );
-            })
+          })
         ) : (
           <p className="py-4 font-bold text-center text-red-500 bg-red-800/20 md:col-span-2 lg:col-span-3">
             No Jobs Added Here

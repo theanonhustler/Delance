@@ -152,7 +152,6 @@ const getFreelancerAcceptedJobs = async (walletAddress: string) => {
     args: [walletAddress],
   });
 
-  console.log(data);
   return data;
 };
 
