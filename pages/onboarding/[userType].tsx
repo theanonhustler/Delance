@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAccount } from "wagmi";
 import { addClientData, addFreelancerData } from "@/blockchain/utils";
+import toast from "react-hot-toast";
 
 function UserType() {
   const router = useRouter();
@@ -91,6 +92,9 @@ function UserType() {
   const { isConnected, address } = useAccount();
 
   const addClientToChain = () => {
+    toast.loading(<b>Adding Client Data to Blockchain</b>, {
+      id: "clientToast",
+    });
     if (isConnected) {
       addClientData(
         clientData.name,
@@ -98,14 +102,31 @@ function UserType() {
         clientData.company,
         clientData.description,
         address!
-      ).then(() => {
-        alert(`Added ${clientData.name} to Celo`);
-        router.push("/dashboard/client");
-      });
+      )
+        .then(() => {
+          toast.success(
+            <b>Added {clientData.name}&apos;s Data to Blockchain</b>,
+            {
+              id: "clientToast",
+            }
+          );
+          router.replace("/dashboard/client");
+        })
+        .catch((err) => {
+          toast.error(
+            <b>Error Adding {clientData.name}&apos;s Data to Blockchain</b>,
+            {
+              id: "clientToast",
+            }
+          );
+        });
     }
   };
 
   const addFreelancerToChain = () => {
+    toast.loading(<b>Adding Freelancer Data to Blockchain</b>, {
+      id: "freelancerToast",
+    });
     if (isConnected) {
       addFreelancerData(
         freelancerData.name,
@@ -114,10 +135,24 @@ function UserType() {
         freelancerData.experience,
         freelancerData.skills,
         address!
-      ).then(() => {
-        alert(`Added ${freelancerData.name} to Celo`);
-        router.replace("/find-a-job");
-      });
+      )
+        .then(() => {
+          toast.success(
+            <b>Added {freelancerData.name}&apos;s Data to Blockchain</b>,
+            {
+              id: "freelancerToast",
+            }
+          );
+          router.replace("/find-a-job");
+        })
+        .catch((err) => {
+          toast.error(
+            <b>Error Adding {freelancerData.name}&apos;s Data to Blockchain</b>,
+            {
+              id: "freelancerToast",
+            }
+          );
+        });
     }
   };
 

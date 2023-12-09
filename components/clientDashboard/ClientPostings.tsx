@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from '../ui/button';
-import Image from 'next/image';
-import { CalendarRange } from 'lucide-react';
-import { useRouter } from 'next/router';
-// import { getAllPostData } from '@/blockchain/constants/utils';
-import { utils } from 'ethers';
-import { useAccount } from 'wagmi';
+import React, { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import moment from "moment";
+import { CalendarRange } from "lucide-react";
+import { useRouter } from "next/router";
+import { getAllPostData } from "@/blockchain/utils";
+import { utils } from "ethers";
+import { useAccount } from "wagmi";
 type Posting = Readonly<{
   id: string;
   category: Category;
@@ -22,6 +22,7 @@ type Posting = Readonly<{
   };
   walletAddress: string;
   clientId?: string;
+  createdAt?: number;
 }>;
 
 type Experience = "Beginner" | "Intermediate" | "Expert";
@@ -39,59 +40,79 @@ type Category =
   | "Engineering";
 
 function ClientPostings() {
-	const router = useRouter();
-	const { address } = useAccount();
+  const router = useRouter();
+  const { address } = useAccount();
 
-	const [postings, setPostings] = useState<Posting[]>([]);
+  const [postings, setPostings] = useState<Posting[]>([]);
 
-	// useEffect(() => {
-	// 	getAllPostData().then((data) =>
-	// 		setPostings(
-	// 			(data as Posting[]).filter((post) => post.clientId === address)
-	// 		)
-	// 	);
-	// }, [address]);
+  useEffect(() => {
+    getAllPostData().then((data) =>
+      setPostings(
+        (data as Posting[]).filter((post) => post.clientId === address)
+      )
+    );
+  }, [address]);
 
-	console.log(postings);
+  function timeConverter(UNIX_timestamp: number) {
+    var a = new Date(Number(UNIX_timestamp) * 1000);
+    var months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    var year = a.getFullYear();
+    var month = months[a.getMonth()];
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = a.getMinutes();
+    var sec = a.getSeconds();
+    var time =
+      date + " " + month + " " + year + " " + hour + ":" + min + ":" + sec;
+    return time;
+  }
 
-	return (
-		<section className='mt-4 font-outfit'>
-			<div className='mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-				{postings.map((post, idx) => (
-					<div
-						className='w-full flex flex-col lg:flex-ro md:justify-between md:items-center gap-8 hover:-translate-y-1 transition-all duration-300 bg-app-grey-light p-4 md:p-8 rounded border border-white/10'
-						key={idx}
-					>
-						<div className='flex flex-col gap-4'>
-							<h2 className='bg-app-slate-blue rounded font-medium px-2 py-1 w-fit'>
-								{post.category}
-							</h2>
-							<h1 className='font-semibold text-2xl'>
-								{post.title}
-							</h1>
-							<div className='text-base flex items-center gap-4'>
-								<p>
-									<span className='font-medium'>
-										{/* @ts-ignore */}
-										{utils.formatEther(post.payInMATIC)}
-									</span>{' '}
-									MATIC
-								</p>
-								<p>•</p>
-								<p className='flex items-center gap-2'>
-									<CalendarRange
-										strokeWidth={1.5}
-										size={18}
-									/>{' '}
-									2 days ago
-								</p>
-							</div>
-						</div>
-						{/* <div className="flex gap-4 items-center">
+  return (
+    <section className="mt-4 font-outfit">
+      <div className="grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3">
+        {postings.map((post, idx) => (
+          <div
+            className="flex flex-col w-full gap-8 p-4 transition-all duration-300 border rounded lg:flex-ro md:justify-between md:items-center hover:-translate-y-1 bg-app-grey-light md:p-8 border-white/10"
+            key={idx}
+          >
+            <div className="flex flex-col gap-4">
+              <h2 className="px-2 py-1 font-medium rounded bg-app-slate-blue w-fit">
+                {post.category}
+              </h2>
+              <h1 className="text-2xl font-semibold">{post.title}</h1>
+              <div className="flex items-center gap-4 text-base">
+                <p>
+                  <span className="font-medium">
+                    {/* @ts-ignore */}
+                    {utils.formatEther(post.payInCELO)}
+                  </span>{" "}
+                  CELO
+                </p>
+                <p>•</p>
+                <p className="flex items-center gap-2">
+                  <CalendarRange strokeWidth={1.5} size={18} />{" "}
+                  {timeConverter(post.createdAt!)}
+                </p>
+              </div>
+            </div>
+            {/* <div className="flex items-center gap-4">
               <div>
                 <Image
                   unoptimized
-                  className="md:w-12 rounded-full md:h-12 w-10 h-10 object-cover"
+                  className="object-cover w-10 h-10 rounded-full md:w-12 md:h-12"
                   src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1770&amp;q=80"
                   alt="company logo"
                   width={100}
@@ -99,7 +120,7 @@ function ClientPostings() {
                 />
               </div>
               <div className="">
-                <h1 className="text-base  font-semibold">Freelancer 1</h1>
+                <h1 className="text-base font-semibold">Freelancer 1</h1>
                 <div className="flex gap-4 text-base font-medium">
                   <p>Junior</p>
                   <p>|</p>
@@ -107,20 +128,18 @@ function ClientPostings() {
                 </div>
               </div>
             </div> */}
-						<Button
-							onClick={() =>
-								router.push(`/dashboard/client/posting/${idx}`)
-							}
-							variant={'secondary'}
-							className='h-12 w-full text-base'
-						>
-							View Posting
-						</Button>
-					</div>
-				))}
-			</div>
-		</section>
-	);
+            <Button
+              onClick={() => router.push(`/dashboard/client/posting/${idx}`)}
+              variant={"secondary"}
+              className="w-full h-12 text-base"
+            >
+              View Posting
+            </Button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export default ClientPostings;

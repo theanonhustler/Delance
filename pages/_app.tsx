@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { Outfit, Work_Sans } from "next/font/google";
-
+import { Toaster } from "react-hot-toast";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 
@@ -44,6 +44,7 @@ const workSans = Work_Sans({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <main className={`${outfit.variable} ${workSans.variable}`}>
+      <Toaster />
       <WagmiConfig config={wagmiConfig}>
         <RainbowKitProvider chains={chains}>
           <Component {...pageProps} />

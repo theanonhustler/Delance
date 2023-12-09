@@ -8,34 +8,34 @@ import Humans from "@/components/home/Humans";
 import Postings from "@/components/home/Postings";
 import Footer from "@/components/layouts/Footer";
 import { ethers } from "ethers";
-// import ABI, { contractAddress } from "@/blockchain/constants/usersABI";
+import { contractAddress, ABI } from "@/blockchain/contact";
 import { useAccount } from "wagmi";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-// import { checkUserExists } from "@/blockchain/constants/utils";
+import { checkUserExists } from "@/blockchain/utils";
 
 export default function Home() {
   const { isConnected, address } = useAccount();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (isConnected) {
-  //     checkUserExists(address!).then((res: unknown) => {
-  //       if ((res as boolean[])[0] === false) {
-  //         router.push("/onboarding");
-  //       } else {
-  //         if ((res as string[])[1] === "Client") {
-  //           router.push("/dashboard/client");
-  //         } else {
-  //           router.push("/dashboard/freelancer");
-  //         }
-  //       }
-  //     });
-  //   }
-  // }, [address]);
+  useEffect(() => {
+    if (isConnected) {
+      checkUserExists(address!).then((res: unknown) => {
+        if ((res as boolean[])[0] === false) {
+          router.push("/onboarding");
+        } else {
+          if ((res as string[])[1] === "Client") {
+            router.push("/dashboard/client");
+          } else {
+            router.push("/dashboard/freelancer");
+          }
+        }
+      });
+    }
+  }, [address]);
 
   return (
-    <div className="flex min-h-screen w-full bg-app-grey-dark text-stone-200">
+    <div className="flex w-full min-h-screen bg-app-grey-dark text-stone-200">
       <Head>
         <title>Delance</title>
       </Head>

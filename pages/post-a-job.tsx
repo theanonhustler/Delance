@@ -12,7 +12,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/layouts/Footer";
-// import { postJob } from "@/blockchain/constants/utils";
+import { postJob } from "@/blockchain/utils";
 import { useRouter } from "next/router";
 
 const PostAJob = () => {
@@ -48,16 +48,16 @@ const PostAJob = () => {
   const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(values);
-    // postJob(
-    //   values.category,
-    //   values.title,
-    //   values.description,
-    //   values.pay,
-    //   values.experience,
-    //   values.location
-    // ).then((res) => {
-    //   router.replace("/dashboard/client");
-    // });
+    postJob(
+      values.title,
+      values.location,
+      values.category,
+      values.pay,
+      values.experience,
+      values.description
+    ).then((res) => {
+      router.replace("/dashboard/client");
+    });
   };
 
   const CATEGORIES = [
@@ -78,7 +78,7 @@ const PostAJob = () => {
       {/* <Header /> */}
       <section className="p-4 md:px-16 lg:max-w-4xl lg:mx-auto font-outfit py-[50px] md:py-[80px]">
         <div className="mx-auto flex flex-col gap-4 text-center pb-[50px] md:pb-[80px]">
-          <h2 className="text-3xl lg:text-5xl font-bold">Post a Job</h2>
+          <h2 className="text-3xl font-bold lg:text-5xl">Post a Job</h2>
           <p className="text-slate-200 md:text-lg">
             Define your project&apos;s requirements, set milestones, and discuss
             terms with ease. Find the right expertise for your tasks with our
@@ -87,11 +87,13 @@ const PostAJob = () => {
         </div>
         <form
           onSubmit={handleSubmit}
-          className="w-full p-4 font-outfit bg-app-grey-light flex flex-col gap-4 rounded border border-white/10"
+          className="flex flex-col w-full gap-4 p-4 border rounded font-outfit bg-app-grey-light border-white/10"
         >
-          <h1 className="font-bold text-xl md:text-2xl">Job Details</h1>
+          <h1 className="text-xl font-bold md:text-2xl">Job Details</h1>
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="title">Job Title</Label>
+            <Label htmlFor="title">
+              Job Title <span className="text-red-500">*</span>
+            </Label>
             <Input
               onChange={handleValuesChange("title")}
               required
@@ -111,7 +113,7 @@ const PostAJob = () => {
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="category" className="mb-2">
-              Category
+              Category <span className="text-red-500">*</span>
             </Label>
             <Select required onValueChange={handleCategorySelect}>
               <SelectTrigger className="w-full h-12">
@@ -127,19 +129,24 @@ const PostAJob = () => {
             </Select>
           </div>
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="location">Job Pay</Label>
+            <Label htmlFor="location">
+              Job Pay <span className="text-red-500">*</span>
+            </Label>
             <Input
               required
               step={0.01}
               onChange={handleValuesChange("pay")}
               type="number"
               className="h-12"
-              placeholder="How much for the work"
+              placeholder="How much for the work (Enter in CELO)"
             />
+            <p className="text-xs italic font-medium text-white/40">
+              1 CELO = $0.612006
+            </p>
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="experiance" className="mb-2">
-              Experiance Level
+              Experiance Level <span className="text-red-500">*</span>
             </Label>
             <Select required onValueChange={handleExperienceSelect}>
               <SelectTrigger className="w-full h-12">
@@ -155,7 +162,9 @@ const PostAJob = () => {
             </Select>
           </div>
           <div className="grid w-full gap-1.5">
-            <Label htmlFor="message">Job Description</Label>
+            <Label htmlFor="message">
+              Job Description <span className="text-red-500">*</span>
+            </Label>
             <Textarea
               required
               onChange={handleValuesChange("description")}

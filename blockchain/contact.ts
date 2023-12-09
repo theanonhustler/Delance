@@ -1,5 +1,5 @@
 export const contractAddress: `0x${string}` =
-  "0x97943f9adA29330917560abEdBf9FfE33C0D42f8";
+  "0x50381F925Df896cbcF56051bEb3d4465637C6e67";
 
 export const ABI = [
   {
@@ -443,6 +443,11 @@ export const ABI = [
             name: "completed",
             type: "bool",
           },
+          {
+            internalType: "uint256",
+            name: "createdAt",
+            type: "uint256",
+          },
         ],
         internalType: "struct UsersContract.Job[]",
         name: "",
@@ -621,6 +626,11 @@ export const ABI = [
             name: "completed",
             type: "bool",
           },
+          {
+            internalType: "uint256",
+            name: "createdAt",
+            type: "uint256",
+          },
         ],
         internalType: "struct UsersContract.Job",
         name: "",
@@ -697,6 +707,11 @@ export const ABI = [
         internalType: "bool",
         name: "completed",
         type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "createdAt",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
