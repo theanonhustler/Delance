@@ -1,5 +1,5 @@
 export const contractAddress: `0x${string}` =
-  "0x682A089119c82Cd41543E4F0b92efFa56D5800BE";
+  "0x9B86881E71e2Ad34c73DDC97a15C49d9981D9708";
 
 export const ABI = [
   {
@@ -124,6 +124,19 @@ export const ABI = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "jobId",
+        type: "uint256",
+      },
+    ],
+    name: "deleteJob",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -171,6 +184,25 @@ export const ABI = [
       },
     ],
     name: "JobCompleted",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "jobId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "clientId",
+        type: "address",
+      },
+    ],
+    name: "JobDeleted",
     type: "event",
   },
   {
@@ -512,6 +544,82 @@ export const ABI = [
     inputs: [
       {
         internalType: "address",
+        name: "freelancerWallet",
+        type: "address",
+      },
+    ],
+    name: "getFreelancerAcceptedJobs",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "clientId",
+            type: "address",
+          },
+          {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "location",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "category",
+            type: "string",
+          },
+          {
+            internalType: "uint256",
+            name: "payInCELO",
+            type: "uint256",
+          },
+          {
+            internalType: "string",
+            name: "experience",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "description",
+            type: "string",
+          },
+          {
+            internalType: "address[]",
+            name: "freelancerRequests",
+            type: "address[]",
+          },
+          {
+            internalType: "address",
+            name: "freelancerId",
+            type: "address",
+          },
+          {
+            internalType: "bool",
+            name: "completed",
+            type: "bool",
+          },
+          {
+            internalType: "uint256",
+            name: "createdAt",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct UsersContract.Job[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "walletAddress",
         type: "address",
       },
@@ -559,6 +667,82 @@ export const ABI = [
         internalType: "struct UsersContract.Freelancer",
         name: "",
         type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "freelancerWallet",
+        type: "address",
+      },
+    ],
+    name: "getFreelancerRequestedJobs",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "clientId",
+            type: "address",
+          },
+          {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "location",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "category",
+            type: "string",
+          },
+          {
+            internalType: "uint256",
+            name: "payInCELO",
+            type: "uint256",
+          },
+          {
+            internalType: "string",
+            name: "experience",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "description",
+            type: "string",
+          },
+          {
+            internalType: "address[]",
+            name: "freelancerRequests",
+            type: "address[]",
+          },
+          {
+            internalType: "address",
+            name: "freelancerId",
+            type: "address",
+          },
+          {
+            internalType: "bool",
+            name: "completed",
+            type: "bool",
+          },
+          {
+            internalType: "uint256",
+            name: "createdAt",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct UsersContract.Job[]",
+        name: "",
+        type: "tuple[]",
       },
     ],
     stateMutability: "view",

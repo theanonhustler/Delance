@@ -1,29 +1,40 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import Image from "next/image";
 import { CalendarRange } from "lucide-react";
 import { useRouter } from "next/router";
+import { getFreelancerAcceptedJobs } from "@/blockchain/utils";
+import { useAccount } from "wagmi";
 
 function JobPostings() {
   const router = useRouter();
+  const { isConnected, address } = useAccount();
+  const [jobs, setJobs] = useState();
+
+  useEffect(() => {
+    getFreelancerAcceptedJobs(address!).then((jobData) => {
+      // @ts-ignore
+      setJobs(jobData);
+      console.log(jobData);
+    });
+  }, [isConnected, address]);
   return (
     <section className="mt-4 font-outfit">
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {Array(5)
-          .fill(true)
-          .map((post, idx) => (
+      <div className="grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3">
+        {/* @ts-ignore */}
+        {jobs?.length > 0 ? (
+          jobs?.map((post, idx) => (
             <div
-              className="w-full flex flex-col lg:flex-ro md:justify-between md:items-center gap-8 hover:-translate-y-1 transition-all duration-300 bg-app-grey-light p-4 md:p-8 rounded border border-white/10"
+              className="flex flex-col w-full gap-8 p-4 transition-all duration-300 border rounded lg:flex-ro md:justify-between md:items-center hover:-translate-y-1 bg-app-grey-light md:p-8 border-white/10"
               key={idx}
             >
               <div className="flex flex-col gap-4">
-                <h2 className="bg-app-slate-blue rounded font-medium px-2 py-1 w-fit">
+                <h2 className="px-2 py-1 font-medium rounded bg-app-slate-blue w-fit">
                   Category
                 </h2>
-                <h1 className="font-semibold text-2xl">
+                <h1 className="text-2xl font-semibold">
                   Digital Marketing Manager
                 </h1>
-                <div className="text-base flex items-center gap-4">
+                <div className="flex items-center gap-4 text-base">
                   <p>
                     <span className="font-medium">8000</span> USD
                   </p>
@@ -33,21 +44,26 @@ function JobPostings() {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-4 items-center">
-                  <span className="text-base  font-semibold">
-                    Assigned by:{" "}
-                  </span>
-                  <h1 className="text-base  font-semibold">Client 1</h1>
+              <div className="flex items-center gap-4">
+                <span className="text-base font-semibold">Assigned by: </span>
+                <h1 className="text-base font-semibold">Client 1</h1>
               </div>
               <Button
-                onClick={() => router.push(`/dashboard/freelancer/posting/${idx}`)}
+                onClick={() =>
+                  router.push(`/dashboard/freelancer/posting/${idx}`)
+                }
                 variant={"secondary"}
-                className="h-12 w-full text-base"
+                className="w-full h-12 text-base"
               >
                 View Job
               </Button>
             </div>
-          ))}
+          ))
+        ) : (
+          <p className="py-4 font-bold text-center text-red-500 bg-red-800/20 md:col-span-2 lg:col-span-3">
+            No Jobs Added Here
+          </p>
+        )}
       </div>
     </section>
   );

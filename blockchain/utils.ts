@@ -132,6 +132,30 @@ const requestForJob = async (jobId: number) => {
   }
 };
 
+const getFreelancerRequestedJobs = async (walletAddress: string) => {
+  const data = await readContract({
+    address: contractAddress,
+    abi: ABI,
+    functionName: "getFreelancerRequestedJobs",
+    args: [walletAddress],
+  });
+
+  console.log(data);
+  return data;
+};
+
+const getFreelancerAcceptedJobs = async (walletAddress: string) => {
+  const data = await readContract({
+    address: contractAddress,
+    abi: ABI,
+    functionName: "getFreelancerAcceptedJobs",
+    args: [walletAddress],
+  });
+
+  console.log(data);
+  return data;
+};
+
 export {
   checkUserExists,
   addClientData,
@@ -141,4 +165,6 @@ export {
   getJobById,
   getClientInfo,
   requestForJob,
+  getFreelancerRequestedJobs,
+  getFreelancerAcceptedJobs,
 };
