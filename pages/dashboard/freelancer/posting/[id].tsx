@@ -5,8 +5,12 @@ import { CheckCircle } from "lucide-react";
 import { upload } from "@spheron/browser-upload";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
+import axios from "axios";
+import { ethers } from "ethers";
+import lighthouse from "@lighthouse-web3/sdk";
 
 function ViewPosting() {
+  
   const CHATS = [
     {
       id: 1,
@@ -31,48 +35,66 @@ function ViewPosting() {
       isClient: false,
     },
   ];
-   const [file, setFile] = useState<File | null>(null);
-   const fileInputRef = useRef<HTMLInputElement | null>(null);
-   const [isLoading, setIsLoading] = useState(false);
-   const [uploadLink, setUploadLink] = useState("");
-   const [dynamicLink, setDynamicLink] = useState("");
+  const [file, setFile] = useState<[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  // const [uploadLink, setUploadLink] = useState("");
+  const [dynamicLink, setDynamicLink] = useState("");
 
-   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-     const selectedFile = event.target.files ? event.target.files[0] : null;
-     setFile(selectedFile);
-     setUploadLink("");
-     setDynamicLink("");
-   };
+  const progressCallback = (progressData: any) => {
+    let percentageDone =
+      100 - Number((progressData?.total / progressData?.uploaded)?.toFixed(2));
+    console.log(percentageDone);
+  };
 
-   const handleSelectFile = () => {
-     if (fileInputRef.current) {
-       fileInputRef.current.click();
-     }
-   };
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files ? event.target.files : null;
+    // @ts-ignore
+    setFile(selectedFile);
+    // setUploadLink("");
+    setDynamicLink("");
+  };
 
-   const handleUpload = async () => {
-     if (!file) {
-       alert("No file selected");
-       return;
-     }
+  const handleSelectFile = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
-     try {
-       setIsLoading(true);
-       const response = await fetch("/api/initiate-upload");
-       const responseJson = await response.json();
-       const uploadResult = await upload([file], {
-         token: responseJson.uploadToken,
-       });
+  const handleUpload = async () => {
+    if (!file) {
+      alert("No file selected");
+      return;
+    }
 
-       setUploadLink(uploadResult.protocolLink);
-       setDynamicLink(uploadResult.dynamicLinks[0]);
-     } catch (err) {
-       alert(err);
-     } finally {
-       setIsLoading(false);
-     }
-   };
-  
+    try {
+      const env = process.env.NEXT_PUBLIC_LIGHTHOUSE_API!;
+      // console.log(fil);
+      const uploadFile = async () => {
+        // @ts-ignore
+        const output = await lighthouse.upload(
+          file,
+          env,
+          false,
+          null,
+          () => {}
+        );
+        console.log("File Status:", output);
+      setDynamicLink("https://gateway.lighthouse.storage/ipfs/" + output.data.Hash);
+        // console.log(
+        //   "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+        // );
+      };
+      uploadFile();
+      alert(dynamicLink)
+      // getApiKey();
+    } catch (err) {
+      alert(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[url('/assets/line-bg.png')] w-full font-outfit bg-app-grey-dark text-stone-200">
       <section className="p-4 flex flex-col md:flex-row md:px-16 items-center gap-12 w-full mx-auto py-[50px] md:py-[80px]">
@@ -155,10 +177,13 @@ function ViewPosting() {
                       />
                     </Button>
                     <div className="flex-1 flex items-center pl-4x text-sm ">
-                      {file ? "File Name:" + " " + file?.name : "No file selected"}
+                      {file.length != 0
+                      // @ts-ignore
+                        ? "File Name:" + " " + Array.from(file)[0].name
+                        : "No file selected"}
                     </div>
                   </div>
-                  <div className="flex flex-col">
+                  <div className="flex flex-col mt-4">
                     <Button
                       // variant={"outline"
                       className="button-con button-53 h-12"
@@ -166,24 +191,6 @@ function ViewPosting() {
                     >
                       Upload
                     </Button>
-                    {/* {uploadLink && (
-                      <a
-                        className="text-sm mt-4 "
-                        href={uploadLink}
-                        target="__blank"
-                      >
-                        {uploadLink}
-                      </a>
-                    )} */}
-                    {/* {dynamicLink && (
-                      <a
-                        className="text-sm mt-4 "
-                        href={`https://${dynamicLink}`}
-                        target="__blank"
-                      >
-                        {dynamicLink}
-                      </a>
-                    )} */}
                   </div>
                 </div>
               </>
