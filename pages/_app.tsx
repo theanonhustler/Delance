@@ -4,13 +4,14 @@ import { Outfit, Work_Sans } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-
+import en from "javascript-time-ago/locale/en";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 
 import { publicProvider } from "wagmi/providers/public";
 
 // Import CELO chain information
 import { Alfajores, Celo } from "@celo/rainbowkit-celo/chains";
+import TimeAgo from "javascript-time-ago";
 
 const { chains, publicClient } = configureChains(
   [Alfajores, Celo],
@@ -42,6 +43,7 @@ const workSans = Work_Sans({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  TimeAgo.addDefaultLocale(en);
   return (
     <main className={`${outfit.variable} ${workSans.variable}`}>
       <Toaster />

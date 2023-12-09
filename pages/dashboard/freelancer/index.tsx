@@ -10,6 +10,7 @@ import ConnectWalletButton from "@/components/connectWalletButton";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import JobPostings from "@/components/freelancerDashboard/JobPostings";
+import CompletedPosting from "@/components/clientDashboard/CompletedPosting";
 
 function ClientDashboard() {
   const { isConnected, address } = useAccount();
@@ -52,12 +53,16 @@ function ClientDashboard() {
             <TabsList className="w-fit">
               <TabsTrigger value="postings">Your Jobs</TabsTrigger>
               <TabsTrigger value="notification">Job Requests</TabsTrigger>
+              <TabsTrigger value="completed-jobs">Completed Jobs</TabsTrigger>
             </TabsList>
             <TabsContent value="postings">
               <JobPostings />
             </TabsContent>
             <TabsContent value="notification">
               <Notifications />
+            </TabsContent>
+            <TabsContent value="completed-jobs">
+              <CompletedPosting />
             </TabsContent>
           </Tabs>
         </div>

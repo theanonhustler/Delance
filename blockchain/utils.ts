@@ -90,7 +90,6 @@ const getAllPostData = async () => {
     args: [],
   });
 
-  console.log(data);
   return data;
 };
 
@@ -102,7 +101,6 @@ const getJobById = async (id: number) => {
     args: [id],
   });
 
-  console.log(data);
   return data;
 };
 
@@ -114,7 +112,17 @@ const getClientInfo = async (walletAddress: string) => {
     args: [walletAddress],
   });
 
-  console.log(data);
+  return data;
+};
+
+const getFreelancerInfo = async (walletAddress: string) => {
+  const data = await readContract({
+    address: contractAddress,
+    abi: ABI,
+    functionName: "getFreelancerData",
+    args: [walletAddress],
+  });
+
   return data;
 };
 
@@ -155,6 +163,48 @@ const getFreelancerAcceptedJobs = async (walletAddress: string) => {
   return data;
 };
 
+const acceptJobRequest = async (walletAddress: string, jobId: string) => {
+  try {
+    const { hash } = await writeContract({
+      address: contractAddress,
+      abi: ABI,
+      functionName: "acceptJobRequest",
+      args: [jobId, walletAddress],
+    });
+    return hash;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const completeJob = async (jobId: string) => {
+  try {
+    const { hash } = await writeContract({
+      address: contractAddress,
+      abi: ABI,
+      functionName: "completeJob",
+      args: [jobId],
+    });
+    return hash;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const deleteJob = async (jobId: string) => {
+  try {
+    const { hash } = await writeContract({
+      address: contractAddress,
+      abi: ABI,
+      functionName: "deleteJob",
+      args: [jobId],
+    });
+    return hash;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export {
   checkUserExists,
   addClientData,
@@ -166,4 +216,8 @@ export {
   requestForJob,
   getFreelancerRequestedJobs,
   getFreelancerAcceptedJobs,
+  getFreelancerInfo,
+  acceptJobRequest,
+  completeJob,
+  deleteJob,
 };
