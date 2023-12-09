@@ -6,8 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { POSTINGS } from "@/constants/postings";
-import { getAllPostData, getClientInfo } from "@/blockchain/utils";
+import { getAllPostData } from "@/blockchain/utils";
 import { utils } from "ethers";
 
 type Posting = Readonly<{
@@ -115,16 +114,11 @@ const SearchJobTitle = () => {
                 No Jobs Found for {router.query.title}
               </p>
             ) : (
-              postings
-                .filter(
-                  (eachData: Posting) =>
-                    eachData.category === router.query.title ||
-                    eachData.experience === router.query.title
+              postings.map((job, idx) => {
+                if (
+                  job.category === router.query.title ||
+                  job.experience === router.query.title
                 )
-                .map(async (job, idx) => {
-                  if (!job.clientId) return null;
-                  const clientInfo = await getClientInfo(job?.clientId);
-                  console.log(clientInfo);
                   return (
                     <div
                       className="flex flex-col w-full gap-8 p-4 transition-all duration-300 border rounded hover:-translate-y-1 h-fit bg-app-grey-light md:p-8 border-white/10"
@@ -147,25 +141,7 @@ const SearchJobTitle = () => {
                           <p>{job.experience}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div>
-                          <Image
-                            unoptimized
-                            className="w-12"
-                            src="https://assets.website-files.com/63b3bf674632664abc613903/63b658d0d4a06814966f7225_company-04.png"
-                            alt="company logo"
-                            width={100}
-                            height={100}
-                          />
-                        </div>
-                        <div>
-                          <h1>Company Name</h1>
-                          <p className="flex items-center gap-1">
-                            <MapPin strokeWidth={1.5} size={16} />{" "}
-                            {job.location}
-                          </p>
-                        </div>
-                      </div>
+
                       <Button
                         variant={"secondary"}
                         className="h-12 text-base"
@@ -175,7 +151,7 @@ const SearchJobTitle = () => {
                       </Button>
                     </div>
                   );
-                })
+              })
             )}
           </div>
         </div>

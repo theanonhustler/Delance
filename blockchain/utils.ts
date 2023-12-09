@@ -118,6 +118,20 @@ const getClientInfo = async (walletAddress: string) => {
   return data;
 };
 
+const requestForJob = async (jobId: number) => {
+  try {
+    const { hash } = await writeContract({
+      address: contractAddress,
+      abi: ABI,
+      functionName: "requestJob",
+      args: [jobId],
+    });
+    return hash;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export {
   checkUserExists,
   addClientData,
@@ -126,4 +140,5 @@ export {
   getAllPostData,
   getJobById,
   getClientInfo,
+  requestForJob,
 };

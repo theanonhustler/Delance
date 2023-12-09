@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { getAllPostData } from "@/blockchain/utils";
 import { utils } from "ethers";
 import { useAccount } from "wagmi";
+import { timeConverter } from "@/lib/utils";
 type Posting = Readonly<{
   id: string;
   category: Category;
@@ -56,33 +57,6 @@ function ClientPostings() {
       )
     );
   }, [address]);
-
-  function timeConverter(UNIX_timestamp: number) {
-    var a = new Date(Number(UNIX_timestamp) * 1000);
-    var months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    var time =
-      date + " " + month + " " + year + " " + hour + ":" + min + ":" + sec;
-    return time;
-  }
 
   return (
     <section className="mt-4 font-outfit">

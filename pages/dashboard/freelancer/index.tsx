@@ -26,12 +26,11 @@ function ClientDashboard() {
     <main className="min-h-screen bg-[url('/assets/line-bg.png')] w-full font-outfit bg-app-grey-dark text-stone-200">
       <div className="p-4 md:px-16 lg:max-w-7xl lg:mx-auto">
         <div className="flex items-center sm:justify-between sm:gap-4">
-          <div className="flex flex-1 items-center justify-end gap-8">
-            
+          <div className="flex items-center justify-end flex-1 gap-8">
             <ConnectWalletButton />
           </div>
         </div>
-        <div className="flex flex-col md:flex-row md:justify-between mt-8 md:items-center gap-4 md:gap-0">
+        <div className="flex flex-col gap-4 mt-8 md:flex-row md:justify-between md:items-center md:gap-0">
           <div className="">
             <h1 className="text-3xl font-bold md:text-5xl">Dashboard</h1>
 
@@ -49,13 +48,13 @@ function ClientDashboard() {
       </div>
       <div className="p-4 md:px-16 lg:max-w-7xl lg:mx-auto py-[50px] md:py-[80px]">
         <div className="w-full">
-          <Tabs defaultValue="postings" className="text-sm md:text-base w-full">
+          <Tabs defaultValue="postings" className="w-full text-sm md:text-base">
             <TabsList className="w-fit">
               <TabsTrigger value="postings">Your Jobs</TabsTrigger>
-              <TabsTrigger value="notification">Notification</TabsTrigger>
+              <TabsTrigger value="notification">Job Requests</TabsTrigger>
             </TabsList>
             <TabsContent value="postings">
-              <JobPostings/>
+              <JobPostings />
             </TabsContent>
             <TabsContent value="notification">
               <Notifications />
