@@ -29,6 +29,7 @@ function ViewPosting() {
   const [freelanceAssigned, setFreelanceAssigned] = useState();
   const [pushAuth, setPushAuth] = useState(false);
   const [chatMessage, setChatMessage] = useState();
+  const [oldChats, setOldChats] = useState<any>([]);
 
   useEffect(() => {
     if (isConnected && id) {
@@ -39,30 +40,17 @@ function ViewPosting() {
     }
   }, [address, id]);
 
-  const CHATS = [
-    {
-      id: 1,
-      message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isClient: true,
-    },
-    {
-      id: 2,
-      message:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.",
-      isClient: false,
-    },
-    {
-      id: 3,
-      message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isClient: true,
-    },
-    {
-      id: 4,
-      message:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.",
-      isClient: false,
-    },
-  ];
+  const [values, setValues] = useState({
+    msg: "",
+  });
+
+  const handleValuesChange =
+    (key: keyof typeof values) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setValues((prev) => {
+        return { ...prev, [key]: e.target.value };
+      });
+    };
 
   const { data: walletClient } = useWalletClient();
 
@@ -84,7 +72,7 @@ function ViewPosting() {
         aliceConnected = true;
         console.log("Alice Stream Connected");
 
-        sendMessage("Sample Message");
+        sendMessage();
       });
 
       streamClient.on(CONSTANTS.STREAM.CHAT, (chat) => {
@@ -94,16 +82,17 @@ function ViewPosting() {
         }
       });
 
-      const sendMessage = async (message: string) => {
+      const sendMessage = async () => {
         if (aliceConnected) {
           console.log(
             "Sending message from Alice to Bob as we know Alice and Bob stream are both connected and can respond"
           );
           console.log("Wait few moments to get messages streaming in");
           await userClient.chat.send(
-            "0x9669aCB2c1Bf762D48C891051c95f6D70dfE2E04",
+            // @ts-ignore
+            post?.freelancerId,
             {
-              content: message,
+              content: values.msg,
             }
           );
         }
@@ -299,33 +288,41 @@ function ViewPosting() {
               <div className=" h-[600px] md:w-3/4 w-full ">
                 <div className="flex flex-col flex-grow w-full h-full overflow-hidden rounded-lg shadow-xl bg-app-grey-light">
                   {pushAuth ? (
-                    <>
-                      <div className="flex flex-col flex-grow h-0 p-4 overflow-auto">
-                        {CHATS.map((chat) => (
-                          <div key={chat.id}>
-                            {chat.isClient ? (
-                              <div className="flex w-full max-w-xs mt-2 space-x-3">
-                                <div className="p-3 rounded-r-lg rounded-bl-lg bg-gray-600/50">
-                                  <p className="text-sm">{chat.message}</p>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex justify-end w-full max-w-xs mt-2 ml-auto space-x-3 ">
-                                <div className="p-3 text-white rounded-l-lg rounded-br-lg bg-app-slate-blue">
-                                  <p className="text-sm">{chat.message}</p>
-                                </div>
-                              </div>
-                            )}
+              <>
+                <div className="flex flex-col flex-grow h-0 p-4 overflow-auto">
+                  {oldChats.map((chat: any) => (
+                    <div key={chat.id}>
+                      {!chat.fromDID.includes(address) ? (
+                        <div className="flex w-full mt-2 space-x-3 max-w-xs">
+                          <div className="p-3 bg-gray-600/50 rounded-r-lg rounded-bl-lg">
+                            <p className="text-sm">{chat.messageContent}</p>
                           </div>
-                        ))}
-                      </div>
-                      <div className="p-4 bg-gray-500/50">
-                        <Input
-                          className="w-full"
-                          placeholder="Type a message"
-                        />
-                      </div>
-                    </>
+                        </div>
+                      ) : (
+                        <div className="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end ">
+                          <div className="bg-app-slate-blue text-white p-3 rounded-l-lg rounded-br-lg">
+                            <p className="text-sm">{chat.messageContent}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-gray-500/50 p-4">
+                  <Input
+                    onChange={handleValuesChange("msg")}
+                    className="w-full"
+                    placeholder="Type a message"
+                  />
+                </div>
+                <Button
+                  onClick={pushInit}
+                  variant={"outline"}
+                  className="h-10 mt-4"
+                >
+                  Send
+                </Button>
+              </>
                   ) : (
                     <div className="flex items-center justify-center">
                       <Button

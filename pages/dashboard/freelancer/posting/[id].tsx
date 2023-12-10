@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 import { send } from "@pushprotocol/restapi/src/lib/chat";
 
 const ViewPosting = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [posting, setPosting] = useState<any>(null);
   const [file, setFile] = useState<[]>([]);
   const [pushAuth, setPushAuth] = useState(false);
@@ -25,7 +25,7 @@ const ViewPosting = () => {
   const [oldChats, setOldChats] = useState<any>([]);
   const { address } = useAccount();
   const [values, setValues] = useState({
-    msg: '',
+    msg: "",
   });
 
   const handleValuesChange =
@@ -36,13 +36,14 @@ const ViewPosting = () => {
       });
     };
 
-
   useEffect(() => {
-    getJobById(Number(router.query.id)).then((data) => {
-      console.log(data)
-      setPosting(data)
-    });
-  }, [])
+
+      getJobById(Number(router.query.id)).then((data) => {
+        console.log(data);
+        setPosting(data);
+      });
+    
+  }, [posting]);
 
   const progressCallback = (progressData: any) => {
     let percentageDone =
@@ -152,12 +153,9 @@ const ViewPosting = () => {
             "Sending message from Alice to Bob as we know Alice and Bob stream are both connected and can respond"
           );
           console.log("Wait few moments to get messages streaming in");
-          await userClient.chat.send(
-            posting.clientId,
-            {
-              content: values?.msg,
-            }
-          );
+          await userClient.chat.send(posting.clientId, {
+            content: "hey",
+          });
         }
       };
 
@@ -273,7 +271,6 @@ const ViewPosting = () => {
             {pushAuth ? (
               <>
                 <div className="flex flex-col flex-grow h-0 p-4 overflow-auto">
-                  {console.log(oldChats)}
                   {oldChats.map((chat: any) => (
                     <div key={chat.id}>
                       {!chat.fromDID.includes(address) ? (
@@ -302,9 +299,10 @@ const ViewPosting = () => {
                 <Button
                   onClick={pushInit}
                   variant={"outline"}
-                  className="h-10 mt-4">
+                  className="h-10 mt-4"
+                >
                   Send
-                  </Button>
+                </Button>
               </>
             ) : (
               <div className="flex justify-center items-center">
