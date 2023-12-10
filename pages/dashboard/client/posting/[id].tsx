@@ -28,7 +28,7 @@ function ViewPosting() {
   const [freelancerRequest, setFreelancerRequest] = useState();
   const [freelanceAssigned, setFreelanceAssigned] = useState();
   const [pushAuth, setPushAuth] = useState(false);
-  const [chatMessage, setChatMessage] = useState()
+  const [chatMessage, setChatMessage] = useState();
 
   useEffect(() => {
     if (isConnected && id) {
@@ -189,9 +189,10 @@ function ViewPosting() {
 
   return (
     <main className="min-h-screen bg-[url('/assets/line-bg.png')] w-full font-outfit bg-app-grey-dark text-stone-200">
-      <section className="p-4 flex flex-col md:flex-row md:px-16 items-center gap-12 w-full mx-auto py-[50px] md:py-[80px]">
-        <div className="w-full md:w-2/3">
+      <section className="p-4  md:px-16 items-center gap-12 w-full mx-auto py-[50px] md:py-[80px]">
+        <div className="grid w-full grid-cols-1 md:grid-cols-2">
           {/* @ts-ignore */}
+
           <h1 className="text-3xl font-bold lg:text-5xl">{post?.title}</h1>
           <p className="mt-4 text-lg font-medium text-slate-200 md:text-xl">
             {/* @ts-ignore */}
@@ -199,12 +200,13 @@ function ViewPosting() {
             {/* @ts-ignore */}
             {post && timeAgo.format(new Date(timeConverter(post?.createdAt)))}
           </p>
+
           {assigned ? (
             <>
               <div className="py-8">
                 <p className="text-lg font-medium">Assigned To:</p>
                 <div className="max-w-lg p-4 mt-2 border-2 rounded-md bg-app-grey-light border-app-grey-light">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 ">
                     <div>
                       <Image
                         unoptimized
@@ -230,6 +232,36 @@ function ViewPosting() {
                     </div>
                   </div>
                 </div>
+                <div className="max-w-lg p-4 mt-4 border-2 rounded-md border-app-grey-light bg-app-grey-light">
+                  <p className="text-md">View Files</p>
+                  <div>
+                    <div className="p-2 mt-2 underline border-2 rounded-md border-stone-500">
+                      1.File one
+                    </div>
+                    <div className="p-2 mt-2 underline border-2 rounded-md border-stone-500">
+                      1.File one
+                    </div>
+                    <div className="p-2 mt-2 underline border-2 rounded-md border-stone-500">
+                      1.File one
+                    </div>
+                  </div>
+                </div>
+                <div className="flex max-w-lg gap-2 mt-4 ">
+                  <Button
+                    onClick={handleCompleteJob}
+                    variant={"outline"}
+                    className="w-full h-12 text-base"
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    onClick={handleRejectJob}
+                    variant={"outline"}
+                    className="w-full h-12 text-base"
+                  >
+                    Decline
+                  </Button>
+                </div>
               </div>
               {/* @ts-ignore */}
               {post && post?.completed ? (
@@ -238,7 +270,7 @@ function ViewPosting() {
                 </p>
               ) : (
                 <>
-                  <div className="max-w-lg p-4 border-2 rounded-md border-app-grey-light bg-app-grey-light">
+                  {/* <div className="max-w-lg p-4 border-2 rounded-md border-app-grey-light bg-app-grey-light">
                     <p className="text-md">Progress</p>
                     <div className="mt-4">
                       <div className="overflow-hidden bg-gray-200 rounded-full">
@@ -260,37 +292,7 @@ function ViewPosting() {
                         </li>
                       </ol>
                     </div>
-                  </div>
-                  <div className="max-w-lg p-4 mt-4 border-2 rounded-md border-app-grey-light bg-app-grey-light">
-                    <p className="text-md">View Files</p>
-                    <div>
-                      <div className="p-2 mt-2 underline border-2 rounded-md border-stone-500">
-                        1.File one
-                      </div>
-                      <div className="p-2 mt-2 underline border-2 rounded-md border-stone-500">
-                        1.File one
-                      </div>
-                      <div className="p-2 mt-2 underline border-2 rounded-md border-stone-500">
-                        1.File one
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex max-w-lg gap-2 mt-4 ">
-                    <Button
-                      onClick={handleCompleteJob}
-                      variant={"outline"}
-                      className="w-full h-12 text-base"
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      onClick={handleRejectJob}
-                      variant={"outline"}
-                      className="w-full h-12 text-base"
-                    >
-                      Decline
-                    </Button>
-                  </div>
+                  </div> */}
                 </>
               )}
 
@@ -339,7 +341,7 @@ function ViewPosting() {
               </div>
             </>
           ) : (
-            <div className="grid grid-cols-1 gap-4 my-4 md:grid-cols-2 md:col-span-2">
+            <div className="grid grid-cols-1 gap-4 my-4 md:grid-cols-2 ">
               {/* @ts-ignore */}
               {freelancerRequest && freelancerRequest.length > 0 ? (
                 // @ts-ignore
