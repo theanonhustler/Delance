@@ -28,6 +28,7 @@ function ViewPosting() {
   const [freelancerRequest, setFreelancerRequest] = useState();
   const [freelanceAssigned, setFreelanceAssigned] = useState();
   const [pushAuth, setPushAuth] = useState(false);
+  const [chatMessage, setChatMessage] = useState()
 
   useEffect(() => {
     if (isConnected && id) {
@@ -66,7 +67,7 @@ function ViewPosting() {
   const { data: walletClient } = useWalletClient();
 
   const pushInit = async () => {
-    if (walletClient) {
+    if (walletClient && CONSTANTS) {
       const userClient = await PushAPI.initialize(walletClient!, {
         env: CONSTANTS.ENV.STAGING,
       });
@@ -83,12 +84,9 @@ function ViewPosting() {
         aliceConnected = true;
         console.log("Alice Stream Connected");
 
-        // Call sendMessage which checks if both Alice and Bob are connected
-        // amd sends a message from Alice to Bob
-        sendMessage();
+        sendMessage("Sample Message");
       });
-      // userAlice.chat.list(type, {options?})
-      
+
       streamClient.on(CONSTANTS.STREAM.CHAT, (chat) => {
         if (chat.origin === "other") {
           // means chat that is coming is sent by other (not self as stream emits both your and other's messages)
@@ -96,16 +94,16 @@ function ViewPosting() {
         }
       });
 
-      const sendMessage = async () => {
+      const sendMessage = async (message: string) => {
         if (aliceConnected) {
           console.log(
             "Sending message from Alice to Bob as we know Alice and Bob stream are both connected and can respond"
           );
           console.log("Wait few moments to get messages streaming in");
           await userClient.chat.send(
-            "0x25544c23F19fAD5ce753c61501A1D3e1A47E19C9",
+            "0x9669aCB2c1Bf762D48C891051c95f6D70dfE2E04",
             {
-              content: "Gm gm! It's a me... Alice!",
+              content: message,
             }
           );
         }
@@ -117,7 +115,6 @@ function ViewPosting() {
       await streamClient.connect();
     }
   };
-
 
   const timeAgo = new TimeAgo("en-US");
 
@@ -298,21 +295,21 @@ function ViewPosting() {
               )}
 
               <div className=" h-[600px] md:w-3/4 w-full ">
-                <div className="flex flex-col flex-grow w-full h-full bg-app-grey-light shadow-xl rounded-lg overflow-hidden">
+                <div className="flex flex-col flex-grow w-full h-full overflow-hidden rounded-lg shadow-xl bg-app-grey-light">
                   {pushAuth ? (
                     <>
                       <div className="flex flex-col flex-grow h-0 p-4 overflow-auto">
                         {CHATS.map((chat) => (
                           <div key={chat.id}>
                             {chat.isClient ? (
-                              <div className="flex w-full mt-2 space-x-3 max-w-xs">
-                                <div className="p-3 bg-gray-600/50 rounded-r-lg rounded-bl-lg">
+                              <div className="flex w-full max-w-xs mt-2 space-x-3">
+                                <div className="p-3 rounded-r-lg rounded-bl-lg bg-gray-600/50">
                                   <p className="text-sm">{chat.message}</p>
                                 </div>
                               </div>
                             ) : (
-                              <div className="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end ">
-                                <div className="bg-app-slate-blue text-white p-3 rounded-l-lg rounded-br-lg">
+                              <div className="flex justify-end w-full max-w-xs mt-2 ml-auto space-x-3 ">
+                                <div className="p-3 text-white rounded-l-lg rounded-br-lg bg-app-slate-blue">
                                   <p className="text-sm">{chat.message}</p>
                                 </div>
                               </div>
@@ -320,7 +317,7 @@ function ViewPosting() {
                           </div>
                         ))}
                       </div>
-                      <div className="bg-gray-500/50 p-4">
+                      <div className="p-4 bg-gray-500/50">
                         <Input
                           className="w-full"
                           placeholder="Type a message"
@@ -328,7 +325,7 @@ function ViewPosting() {
                       </div>
                     </>
                   ) : (
-                    <div className="flex justify-center items-center">
+                    <div className="flex items-center justify-center">
                       <Button
                         onClick={pushInit}
                         variant={"outline"}
