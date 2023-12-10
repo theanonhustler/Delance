@@ -19,16 +19,24 @@ function Header() {
   return (
     <nav className="px-4 md:p-0 sticky top-0 z-50 flex items-center h-[5rem] bg-app-grey-dark justify-between md:px-16  lg:mx-auto">
       <Link href={"/"}>
-        <h1 className="text-2xl font-semibold">Delance</h1>
+        <h1 className="text-2xl font-semibold">
+          <Image
+            src={"/assets/delance-yellow.png"}
+            width={1080}
+            height={1920}
+            alt="image"
+            className="w-20 p-2"
+          />
+        </h1>
       </Link>
       <div className="font-normal">
-        <ul className=" lg:flex lg:gap-4 text-center text-md xl:text-lg items-center hidden">
+        <ul className="items-center hidden text-center lg:flex lg:gap-4 text-md xl:text-lg">
           {NAVBAR_NAVIGATION.map((link) => (
             <li key={`nav-mobile-link-${link.link}`} className="p-2">
               <Button
                 variant={"secondary"}
                 asChild
-                className="rounded border-0 transition-colors hover:bg-app-grey-light h-12 duration-300 ease-in-out"
+                className="h-12 transition-colors duration-300 ease-in-out border-0 rounded hover:bg-app-grey-light"
               >
                 <Link href={link.link} target={link.target}>
                   {link.title}
@@ -36,12 +44,14 @@ function Header() {
               </Button>
             </li>
           ))}
-          <li><ConnectWalletButton /></li>
+          <li>
+            <ConnectWalletButton />
+          </li>
         </ul>
       </div>
       <div className="lg:hidden">
         <Sheet>
-          <SheetTrigger className="lg:hidden py-4">
+          <SheetTrigger className="py-4 lg:hidden">
             <Menu strokeWidth={1.5} size={24} />
           </SheetTrigger>
           <SheetContent className="bg-app-grey-dark">
@@ -50,14 +60,14 @@ function Header() {
                 Delance
               </SheetTitle>
               <SheetDescription>
-                <nav className="contents font-semibold ">
-                  <ul className="mx-auto flex flex-col items-center ">
+                <nav className="font-semibold contents ">
+                  <ul className="flex flex-col items-center mx-auto ">
                     {NAVBAR_NAVIGATION.map((link) => (
                       <li key={`nav-mobile-link-${link.link}`} className="p-2">
                         <Button
                           variant={"secondary"}
                           asChild
-                          className="rounded border-0 transition-colors hover:bg-app-grey-light h-12 duration-300 ease-in-out"
+                          className="h-12 transition-colors duration-300 ease-in-out border-0 rounded hover:bg-app-grey-light"
                         >
                           <Link href={link.link} target={link.target}>
                             {link.title}
