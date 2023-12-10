@@ -105,6 +105,7 @@ const ViewPosting = () => {
       const userClient = await PushAPI.initialize(walletClient!, {
         env: CONSTANTS.ENV.STAGING,
       });
+      setPushAuth(true);
 
       const streamClient = await userClient.initStream([
         CONSTANTS.STREAM.CHAT,
@@ -123,7 +124,14 @@ const ViewPosting = () => {
       });
       // userAlice.chat.list(type, {options?})
       const aliceChats = await userClient.chat.list("REQUESTS");
-      console.log("Alice chats", aliceChats);
+      console.log("Alice chats", aliceChats[0]);
+      if (aliceChats.length != 0) {
+        const bobAcceptAliceRequest = await userClient.chat.accept(
+          aliceChats[0].wallets
+        );
+        console.log("Bob accepted Alice's chat request", bobAcceptAliceRequest);
+
+      }
       streamClient.on(CONSTANTS.STREAM.CHAT, (chat) => {
         if (chat.origin === "other") {
           // means chat that is coming is sent by other (not self as stream emits both your and other's messages)
@@ -138,7 +146,7 @@ const ViewPosting = () => {
           );
           console.log("Wait few moments to get messages streaming in");
           await userClient.chat.send(
-            "0xb14D98C30921B2e13E8d138E82567aC7e2ffe2E2",
+            "0x25544c23F19fAD5ce753c61501A1D3e1A47E19C9",
             {
               content: "Gm gm! It's a me... Alice!",
             }
