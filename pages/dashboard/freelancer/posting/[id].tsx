@@ -24,6 +24,8 @@ const ViewPosting = () => {
   const [dynamicLink, setDynamicLink] = useState("");
   const [oldChats, setOldChats] = useState<any>([]);
   const { address } = useAccount();
+  const [userClientState, setUserClientState] = useState<any>(null);
+  const [clientStatus, setClientStatus] = useState(false);
   const { id } = router.query;
   const [values, setValues] = useState({
     msg: "",
@@ -110,6 +112,7 @@ const ViewPosting = () => {
         env: CONSTANTS.ENV.STAGING,
       });
       setPushAuth(true);
+      setUserClientState(userClient);
 
       const streamClient = await userClient.initStream([
         CONSTANTS.STREAM.CHAT,
@@ -119,7 +122,7 @@ const ViewPosting = () => {
 
       let aliceConnected = false;
       streamClient.on(CONSTANTS.STREAM.CONNECT, () => {
-        aliceConnected = true;
+        setClientStatus(true);
         console.log("Alice Stream Connected");
 
         // Call sendMessage which checks if both Alice and Bob are connected
@@ -148,24 +151,30 @@ const ViewPosting = () => {
       console.log(aliceChatHistoryWithBob);
       setOldChats(aliceChatHistoryWithBob);
 
-      const sendMessage = async () => {
-        if (aliceConnected) {
-          console.log(
-            "Sending message from Alice to Bob as we know Alice and Bob stream are both connected and can respond"
-          );
-          console.log("Wait few moments to get messages streaming in");
-          await userClient.chat.send(posting.clientId, {
-            content: "hey",
-          });
-        }
-      };
-
+      
       streamClient.on(CONSTANTS.STREAM.CHAT_OPS, (chatops) => {
         console.log("Alice received chat ops", chatops);
         oldChats.push(chatops);
       });
       await streamClient.connect();
     }
+  };
+  
+  
+  const sendMessage = async () => {
+     if (clientStatus) {
+       console.log(
+         "Sending message from Alice to Bob as we know Alice and Bob stream are both connected and can respond"
+       );
+       console.log("Wait few moments to get messages streaming in");
+       await userClientState?.chat.send(
+         // @ts-ignore
+         posting.clientId,
+         {
+           content: values.msg,
+         }
+       );
+     }
   };
 
   return (

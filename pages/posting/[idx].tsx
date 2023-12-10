@@ -58,6 +58,7 @@ const IndividualPostingPage = () => {
 
   useEffect(() => {
     if (isConnected && idx) {
+      // @ts-ignore
       getJobById(Number(idx)).then((data) => {
         /* @ts-ignore */
         setPost(data as Posting[]);

@@ -78,6 +78,12 @@ function ViewPosting() {
 
         sendMessage();
       });
+      const aliceChatHistoryWithBob = await userClient.chat.history(
+        // @ts-ignore
+        post?.freelancerId
+      );
+      console.log(aliceChatHistoryWithBob);
+      setOldChats(aliceChatHistoryWithBob);
 
       streamClient.on(CONSTANTS.STREAM.CHAT, (chat) => {
         if (chat.origin === "other") {
@@ -89,24 +95,26 @@ function ViewPosting() {
       
       streamClient.on(CONSTANTS.STREAM.CHAT_OPS, (chatops) => {
         console.log("Alice received chat ops", chatops);
+        oldChats.push(chatops);
       });
       await streamClient.connect();
     }
   };
-  const sendMessage = async () => {
 
-      if (clientStatus ) {
+  const sendMessage = async () => {
+      console.log(post)
+      if (clientStatus && post ) {
         console.log(
           "Sending message from Alice to Bob as we know Alice and Bob stream are both connected and can respond"
         );
         console.log("Wait few moments to get messages streaming in");
-        await userClientState?.chat.send(
-          // @ts-ignore
-          post?.freelancerId,
-          {
-            content: values.msg,
-          }
-        );
+        // await userClientState?.chat.send(
+        //   // @ts-ignore
+        //   post?.freelancerId,
+        //   {
+        //     content: values.msg,
+        //   }
+        // );
       }
   };
   
