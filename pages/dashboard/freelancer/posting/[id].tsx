@@ -24,6 +24,7 @@ const ViewPosting = () => {
   const [dynamicLink, setDynamicLink] = useState("");
   const [oldChats, setOldChats] = useState<any>([]);
   const { address } = useAccount();
+  const { id } = router.query;
   const [values, setValues] = useState({
     msg: "",
   });
@@ -37,13 +38,13 @@ const ViewPosting = () => {
     };
 
   useEffect(() => {
-
-      getJobById(Number(router.query.id)).then((data) => {
-        console.log(data);
+    if (router.isReady){
+      // @ts-ignore
+      getJobById(id).then((data) => {
         setPosting(data);
       });
-    
-  }, [posting]);
+    }
+  }, [posting,router.isReady]);
 
   const progressCallback = (progressData: any) => {
     let percentageDone =

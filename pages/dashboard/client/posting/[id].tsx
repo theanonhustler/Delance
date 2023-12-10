@@ -30,15 +30,18 @@ function ViewPosting() {
   const [pushAuth, setPushAuth] = useState(false);
   const [chatMessage, setChatMessage] = useState();
   const [oldChats, setOldChats] = useState<any>([]);
+  const [userClientState,setUserClientState] = useState<any>(null);
+  const [clientStatus,setClientStatus] = useState(false);
 
   useEffect(() => {
-    if (isConnected && id) {
-      getJobById(Number(id)).then((data) => {
+    if (isConnected && router.isReady) {
+      // @ts-ignore
+      getJobById(id).then((data) => {
         /* @ts-ignore */
         setPost(data as Posting[]);
       });
     }
-  }, [address, id]);
+  }, [address, router.isReady]);
 
   const [values, setValues] = useState({
     msg: "",
@@ -60,6 +63,7 @@ function ViewPosting() {
         env: CONSTANTS.ENV.STAGING,
       });
       setPushAuth(true);
+      setUserClientState(userClient);
 
       const streamClient = await userClient.initStream([
         CONSTANTS.STREAM.CHAT,
@@ -69,7 +73,7 @@ function ViewPosting() {
 
       let aliceConnected = false;
       streamClient.on(CONSTANTS.STREAM.CONNECT, () => {
-        aliceConnected = true;
+        setClientStatus(true);
         console.log("Alice Stream Connected");
 
         sendMessage();
@@ -82,29 +86,30 @@ function ViewPosting() {
         }
       });
 
-      const sendMessage = async () => {
-        if (aliceConnected) {
-          console.log(
-            "Sending message from Alice to Bob as we know Alice and Bob stream are both connected and can respond"
-          );
-          console.log("Wait few moments to get messages streaming in");
-          await userClient.chat.send(
-            // @ts-ignore
-            post?.freelancerId,
-            {
-              content: values.msg,
-            }
-          );
-        }
-      };
-
+      
       streamClient.on(CONSTANTS.STREAM.CHAT_OPS, (chatops) => {
         console.log("Alice received chat ops", chatops);
       });
       await streamClient.connect();
     }
   };
+  const sendMessage = async () => {
 
+      if (clientStatus ) {
+        console.log(
+          "Sending message from Alice to Bob as we know Alice and Bob stream are both connected and can respond"
+        );
+        console.log("Wait few moments to get messages streaming in");
+        await userClientState?.chat.send(
+          // @ts-ignore
+          post?.freelancerId,
+          {
+            content: values.msg,
+          }
+        );
+      }
+  };
+  
   const timeAgo = new TimeAgo("en-US");
 
   const assigned =
@@ -316,7 +321,7 @@ function ViewPosting() {
                   />
                 </div>
                 <Button
-                  onClick={pushInit}
+                  onClick={()=>sendMessage()}
                   variant={"outline"}
                   className="h-10 mt-4"
                 >

@@ -93,15 +93,19 @@ const getAllPostData = async () => {
   return data;
 };
 
-const getJobById = async (id: number) => {
-  const data = await readContract({
-    address: contractAddress,
-    abi: ABI,
-    functionName: "getJobById",
-    args: [id],
-  });
+const getJobById = async (id: string) => {
+  if(id){
 
-  return data;
+    const data = await readContract({
+      address: contractAddress,
+      abi: ABI,
+      functionName: "getJobById",
+      args: [id],
+    });
+    return data;
+  }
+  
+
 };
 
 const getClientInfo = async (walletAddress: string) => {
