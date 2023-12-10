@@ -26,12 +26,13 @@ contract UsersContract {
         string title;
         string location;
         string category;
-        uint payInCELO; // Use CELO instead of MATIC
+        uint payInCELO;
         string experience;
         string description;
         address[] freelancerRequests;
         address freelancerId;
         bool completed;
+        uint256 createdAt;
     }
 
     mapping(address => Client) public clients;
@@ -44,6 +45,12 @@ contract UsersContract {
     event JobAccepted(uint256 indexed jobId, address indexed clientId, address indexed freelancerId);
     event JobCompleted(uint256 indexed jobId, address indexed clientId, address indexed freelancerId);
     event CEL0Transferred(address indexed freelancerId, uint amount);
+    event JobDeleted(uint256 indexed jobId, address indexed clientId);
+
+    modifier onlyClient(uint256 jobId) {
+        require(jobs[jobId].clientId == msg.sender, "Only the client can perform this operation");
+        _;
+    }
 
     function addOrUpdateClientData(
         string memory yourName,
@@ -92,19 +99,30 @@ contract UsersContract {
         }
     }
 
-
     function postJob(
         string memory title,
         string memory location,
         string memory category,
-        uint payInCELO, // Use CELO instead of MATIC
+        uint payInCELO,
         string memory experience,
         string memory description
     ) public payable returns (uint256 jobId) {
         require(msg.value == payInCELO, "Please transfer the correct amount of CELO.");
 
         jobId = jobCounter++;
-        jobs[jobId] = Job(msg.sender, title, location, category, payInCELO, experience, description, new address[](0), address(0), false);
+        jobs[jobId] = Job(
+            msg.sender,
+            title,
+            location,
+            category,
+            payInCELO,
+            experience,
+            description,
+            new address[](0),
+            address(0),
+            false,
+            block.timestamp
+        );
 
         emit JobPosted(jobId, msg.sender);
     }
@@ -148,7 +166,7 @@ contract UsersContract {
 
         require(freelancerId != address(0), "No freelancer assigned to the job");
 
-        uint payInCELO = job.payInCELO; // Use CELO instead of MATIC
+        uint payInCELO = job.payInCELO;
 
         (bool success, ) = payable(freelancerId).call{value: payInCELO}("");
         require(success, "CELO transfer failed");
@@ -157,6 +175,21 @@ contract UsersContract {
 
         emit JobCompleted(jobId, msg.sender, freelancerId);
         emit CEL0Transferred(freelancerId, payInCELO);
+    }
+
+    function deleteJob(uint256 jobId) public onlyClient(jobId) {
+        Job storage job = jobs[jobId];
+        require(!job.completed, "Cannot delete a completed job");
+
+        if (job.payInCELO > 0) {
+            // Transfer remaining CELO back to the client
+            (bool success, ) = payable(msg.sender).call{value: job.payInCELO}("");
+            require(success, "CELO transfer to client failed");
+        }
+
+        delete jobs[jobId];
+
+        emit JobDeleted(jobId, msg.sender);
     }
 
     function getAllJobs() public view returns (Job[] memory) {
@@ -175,5 +208,61 @@ contract UsersContract {
 
         Job storage job = jobs[jobId];
         return job;
+    }
+
+    function getFreelancerRequestedJobs(address freelancerWallet) public view returns (Job[] memory) {
+        uint256 requestedJobsCount = 0;
+
+        for (uint256 i = 0; i < jobCounter; i++) {
+            Job storage job = jobs[i];
+
+            for (uint256 j = 0; j < job.freelancerRequests.length; j++) {
+                if (job.freelancerRequests[j] == freelancerWallet) {
+                    requestedJobsCount++;
+                    break;
+                }
+            }
+        }
+
+        Job[] memory requestedJobs = new Job[](requestedJobsCount);
+        uint256 index = 0;
+
+        for (uint256 i = 0; i < jobCounter; i++) {
+            Job storage job = jobs[i];
+
+            for (uint256 j = 0; j < job.freelancerRequests.length; j++) {
+                if (job.freelancerRequests[j] == freelancerWallet) {
+                    requestedJobs[index++] = job;
+                    break;
+                }
+            }
+        }
+
+        return requestedJobs;
+    }
+
+    function getFreelancerAcceptedJobs(address freelancerWallet) public view returns (Job[] memory) {
+        uint256 acceptedJobsCount = 0;
+
+        for (uint256 i = 0; i < jobCounter; i++) {
+            Job storage job = jobs[i];
+
+            if (job.freelancerId == freelancerWallet && job.completed) {
+                acceptedJobsCount++;
+            }
+        }
+
+        Job[] memory acceptedJobs = new Job[](acceptedJobsCount);
+        uint256 index = 0;
+
+        for (uint256 i = 0; i < jobCounter; i++) {
+            Job storage job = jobs[i];
+
+            if (job.freelancerId == freelancerWallet && job.completed) {
+                acceptedJobs[index++] = job;
+            }
+        }
+
+        return acceptedJobs;
     }
 }
