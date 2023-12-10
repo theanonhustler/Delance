@@ -1,5 +1,5 @@
 {
-  "name": "DeWorks",
+  "name": "Delance",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,7 +11,7 @@
   "dependencies": {
     "@celo/rainbowkit-celo": "^1.1.0",
     "@lighthouse-web3/sdk": "^0.3.0",
-    "@pushprotocol/restapi": "^1.4.28",
+    "@pushprotocol/restapi": "^1.4.45",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-dialog": "1.0.4",
     "@radix-ui/react-label": "^2.0.2",
@@ -40,7 +40,7 @@
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
     "viem": "^1.16.6",
-    "wagmi": "^1.4.4"
+    "wagmi": "^1.4.10"
   },
   "devDependencies": {
     "@types/json5": "^2.2.0",

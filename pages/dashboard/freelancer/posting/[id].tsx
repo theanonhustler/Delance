@@ -2,15 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { CheckCircle } from "lucide-react";
-import { upload } from "@spheron/browser-upload";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { ethers } from "ethers";
 import lighthouse from "@lighthouse-web3/sdk";
+import { useWalletClient } from "wagmi";
+import { PushAPI, CONSTANTS } from "@pushprotocol/restapi";
 
-function ViewPosting() {
-  
+const ViewPosting = () => {
   const CHATS = [
     {
       id: 1,
@@ -36,6 +36,7 @@ function ViewPosting() {
     },
   ];
   const [file, setFile] = useState<[]>([]);
+  const [pushAuth, setPushAuth] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   // const [uploadLink, setUploadLink] = useState("");
@@ -80,18 +81,75 @@ function ViewPosting() {
           () => {}
         );
         console.log("File Status:", output);
-      setDynamicLink("https://gateway.lighthouse.storage/ipfs/" + output.data.Hash);
+        setDynamicLink(
+          "https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+        );
         // console.log(
         //   "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
         // );
       };
       uploadFile();
-      alert(dynamicLink)
+      alert(dynamicLink);
       // getApiKey();
     } catch (err) {
       alert(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const { data: walletClient } = useWalletClient();
+
+  const pushInit = async () => {
+    if (walletClient) {
+      const userClient = await PushAPI.initialize(walletClient!, {
+        env: CONSTANTS.ENV.STAGING,
+      });
+
+      const streamClient = await userClient.initStream([
+        CONSTANTS.STREAM.CHAT,
+        CONSTANTS.STREAM.CHAT_OPS,
+        CONSTANTS.STREAM.CONNECT,
+      ]);
+
+      let aliceConnected = false;
+      streamClient.on(CONSTANTS.STREAM.CONNECT, () => {
+        aliceConnected = true;
+        console.log("Alice Stream Connected");
+
+        // Call sendMessage which checks if both Alice and Bob are connected
+        // amd sends a message from Alice to Bob
+        sendMessage();
+      });
+      // userAlice.chat.list(type, {options?})
+      const aliceChats = await userClient.chat.list("REQUESTS");
+      console.log("Alice chats", aliceChats);
+      streamClient.on(CONSTANTS.STREAM.CHAT, (chat) => {
+        if (chat.origin === "other") {
+          // means chat that is coming is sent by other (not self as stream emits both your and other's messages)
+          console.log("Alice received chat message", chat);
+        }
+      });
+
+      const sendMessage = async () => {
+        if (aliceConnected) {
+          console.log(
+            "Sending message from Alice to Bob as we know Alice and Bob stream are both connected and can respond"
+          );
+          console.log("Wait few moments to get messages streaming in");
+          await userClient.chat.send(
+            "0xb14D98C30921B2e13E8d138E82567aC7e2ffe2E2",
+            {
+              content: "Gm gm! It's a me... Alice!",
+            }
+          );
+        }
+      };
+
+      streamClient.on(CONSTANTS.STREAM.CHAT_OPS, (chatops) => {
+        console.log("Alice received chat ops", chatops);
+      });
+      await streamClient.connect();
     }
   };
 
@@ -116,7 +174,7 @@ function ViewPosting() {
               </div>
             </div>
           </div>
-          <div className="p-4 border-2 border-app-grey-light bg-app-grey-light rounded-md max-w-md">
+          {/* <div className="p-4 border-2 border-app-grey-light bg-app-grey-light rounded-md max-w-md">
             <p className="text-base font-medium">Update the Progress</p>
             <div className="mt-4 flex flex-col gap-4">
               <div className="flex justify-between items-center">
@@ -138,7 +196,7 @@ function ViewPosting() {
                 </Button>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="p-4 border-2 border-app-grey-light bg-app-grey-light rounded-md mt-4 max-w-md">
             <p className="text-md">Submit Files</p>
             {/* <Button variant={"outline"} className="h-10 mt-4">
@@ -178,14 +236,13 @@ function ViewPosting() {
                     </Button>
                     <div className="flex-1 flex items-center pl-4x text-sm ">
                       {file.length != 0
-                      // @ts-ignore
-                        ? "File Name:" + " " + Array.from(file)[0].name
+                        ? // @ts-ignore
+                          "File Name:" + " " + Array.from(file)[0].name
                         : "No file selected"}
                     </div>
                   </div>
                   <div className="flex flex-col mt-4">
                     <Button
-                      // variant={"outline"
                       className="button-con button-53 h-12"
                       onClick={handleUpload}
                     >
@@ -199,33 +256,47 @@ function ViewPosting() {
         </div>
         <div className=" h-[600px] md:w-3/4 w-full ">
           <div className="flex flex-col flex-grow w-full h-full bg-app-grey-light shadow-xl rounded-lg overflow-hidden">
-            <div className="flex flex-col flex-grow h-0 p-4 overflow-auto">
-              {CHATS.map((chat) => (
-                <div key={chat.id}>
-                  {chat.isClient ? (
-                    <div className="flex w-full mt-2 space-x-3 max-w-xs">
-                      <div className="p-3 bg-gray-600/50 rounded-r-lg rounded-bl-lg">
-                        <p className="text-sm">{chat.message}</p>
-                      </div>
+            {pushAuth ? (
+              <>
+                <div className="flex flex-col flex-grow h-0 p-4 overflow-auto">
+                  {CHATS.map((chat) => (
+                    <div key={chat.id}>
+                      {chat.isClient ? (
+                        <div className="flex w-full mt-2 space-x-3 max-w-xs">
+                          <div className="p-3 bg-gray-600/50 rounded-r-lg rounded-bl-lg">
+                            <p className="text-sm">{chat.message}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end ">
+                          <div className="bg-app-slate-blue text-white p-3 rounded-l-lg rounded-br-lg">
+                            <p className="text-sm">{chat.message}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end ">
-                      <div className="bg-app-slate-blue text-white p-3 rounded-l-lg rounded-br-lg">
-                        <p className="text-sm">{chat.message}</p>
-                      </div>
-                    </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className="bg-gray-500/50 p-4">
-              <Input className="w-full" placeholder="Type a message" />
-            </div>
+                <div className="bg-gray-500/50 p-4">
+                  <Input className="w-full" placeholder="Type a message" />
+                </div>
+              </>
+            ) : (
+              <div className="flex justify-center items-center">
+                <Button
+                  onClick={pushInit}
+                  variant={"outline"}
+                  className="h-10 mt-4"
+                >
+                  Authenticated your wallet to chat
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </section>
     </main>
   );
-}
+};
 
 export default ViewPosting;
