@@ -7,40 +7,42 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { ethers } from "ethers";
 import lighthouse from "@lighthouse-web3/sdk";
-import { useWalletClient } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { PushAPI, CONSTANTS } from "@pushprotocol/restapi";
+import { getJobById } from "@/blockchain/utils";
+import { useRouter } from "next/router";
+import { send } from "@pushprotocol/restapi/src/lib/chat";
 
 const ViewPosting = () => {
-  const CHATS = [
-    {
-      id: 1,
-      message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isClient: true,
-    },
-    {
-      id: 2,
-      message:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.",
-      isClient: false,
-    },
-    {
-      id: 3,
-      message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isClient: true,
-    },
-    {
-      id: 4,
-      message:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.",
-      isClient: false,
-    },
-  ];
+  const router = useRouter()
+  const [posting, setPosting] = useState<any>(null);
   const [file, setFile] = useState<[]>([]);
   const [pushAuth, setPushAuth] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   // const [uploadLink, setUploadLink] = useState("");
   const [dynamicLink, setDynamicLink] = useState("");
+  const [oldChats, setOldChats] = useState<any>([]);
+  const { address } = useAccount();
+  const [values, setValues] = useState({
+    msg: '',
+  });
+
+  const handleValuesChange =
+    (key: keyof typeof values) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setValues((prev) => {
+        return { ...prev, [key]: e.target.value };
+      });
+    };
+
+
+  useEffect(() => {
+    getJobById(Number(router.query.id)).then((data) => {
+      console.log(data)
+      setPosting(data)
+    });
+  }, [])
 
   const progressCallback = (progressData: any) => {
     let percentageDone =
@@ -101,7 +103,7 @@ const ViewPosting = () => {
   const { data: walletClient } = useWalletClient();
 
   const pushInit = async () => {
-    if (walletClient) {
+    if (walletClient && posting.clientId) {
       const userClient = await PushAPI.initialize(walletClient!, {
         env: CONSTANTS.ENV.STAGING,
       });
@@ -130,7 +132,6 @@ const ViewPosting = () => {
           aliceChats[0].wallets
         );
         console.log("Bob accepted Alice's chat request", bobAcceptAliceRequest);
-
       }
       streamClient.on(CONSTANTS.STREAM.CHAT, (chat) => {
         if (chat.origin === "other") {
@@ -138,6 +139,12 @@ const ViewPosting = () => {
           console.log("Alice received chat message", chat);
         }
       });
+      // userAlice.chat.history(recipient. {options?})
+      const aliceChatHistoryWithBob = await userClient.chat.history(
+        posting.clientId
+      );
+      console.log(aliceChatHistoryWithBob);
+      setOldChats(aliceChatHistoryWithBob);
 
       const sendMessage = async () => {
         if (aliceConnected) {
@@ -146,9 +153,9 @@ const ViewPosting = () => {
           );
           console.log("Wait few moments to get messages streaming in");
           await userClient.chat.send(
-            "0x25544c23F19fAD5ce753c61501A1D3e1A47E19C9",
+            posting.clientId,
             {
-              content: "Gm gm! It's a me... Alice!",
+              content: values?.msg,
             }
           );
         }
@@ -156,6 +163,7 @@ const ViewPosting = () => {
 
       streamClient.on(CONSTANTS.STREAM.CHAT_OPS, (chatops) => {
         console.log("Alice received chat ops", chatops);
+        oldChats.push(chatops);
       });
       await streamClient.connect();
     }
@@ -165,9 +173,7 @@ const ViewPosting = () => {
     <main className="min-h-screen bg-[url('/assets/line-bg.png')] w-full font-outfit bg-app-grey-dark text-stone-200">
       <section className="p-4 flex flex-col md:flex-row md:px-16 items-center gap-12 w-full mx-auto py-[50px] md:py-[80px]">
         <div className="md:w-2/3 w-full">
-          <h1 className="text-3xl lg:text-5xl font-bold">
-            Digital Marketing Manager
-          </h1>
+          <h1 className="text-3xl lg:text-5xl font-bold">{posting?.title}</h1>
           <p className="text-slate-200 text-lg font-medium md:text-xl mt-4">
             $8000 USD • 2 days ago
           </p>
@@ -267,18 +273,19 @@ const ViewPosting = () => {
             {pushAuth ? (
               <>
                 <div className="flex flex-col flex-grow h-0 p-4 overflow-auto">
-                  {CHATS.map((chat) => (
+                  {console.log(oldChats)}
+                  {oldChats.map((chat: any) => (
                     <div key={chat.id}>
-                      {chat.isClient ? (
+                      {!chat.fromDID.includes(address) ? (
                         <div className="flex w-full mt-2 space-x-3 max-w-xs">
                           <div className="p-3 bg-gray-600/50 rounded-r-lg rounded-bl-lg">
-                            <p className="text-sm">{chat.message}</p>
+                            <p className="text-sm">{chat.messageContent}</p>
                           </div>
                         </div>
                       ) : (
                         <div className="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end ">
                           <div className="bg-app-slate-blue text-white p-3 rounded-l-lg rounded-br-lg">
-                            <p className="text-sm">{chat.message}</p>
+                            <p className="text-sm">{chat.messageContent}</p>
                           </div>
                         </div>
                       )}
@@ -286,8 +293,18 @@ const ViewPosting = () => {
                   ))}
                 </div>
                 <div className="bg-gray-500/50 p-4">
-                  <Input className="w-full" placeholder="Type a message" />
+                  <Input
+                    onChange={handleValuesChange("msg")}
+                    className="w-full"
+                    placeholder="Type a message"
+                  />
                 </div>
+                <Button
+                  onClick={pushInit}
+                  variant={"outline"}
+                  className="h-10 mt-4">
+                  Send
+                  </Button>
               </>
             ) : (
               <div className="flex justify-center items-center">
